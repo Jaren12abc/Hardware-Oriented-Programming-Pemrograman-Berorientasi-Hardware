@@ -1,0 +1,52 @@
+#define BLYNK_AUTH_TOKEN "af-CpBkbhHOTpU3fCoQSnmxMTbyVqeaX"
+#define BLYNK_PRINT Serial
+
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
+
+
+#include <DHT.h>
+
+char auth[] = BLYNK_AUTH_TOKEN;
+
+char ssid[] = "Jaren"; //nama hotspot yang digunakan
+char pass[] = "jarenjaya"; //password hotspot yang digunakan
+
+#define DHTPIN 5          // Mention the digital pin where you connected 
+#define DHTTYPE DHT22     // DHT 11  
+DHT dht(DHTPIN, DHTTYPE);
+BlynkTimer timer;
+
+
+
+void setup(){
+   Serial.begin(115200);
+  Blynk.begin(auth, ssid, pass);
+  // You can also specify server:
+  //Blynk.begin(auth, ssid, pass, "blynk.cloud", 80);
+  //Blynk.begin(auth, ssid, pass, IPAddress(192,168,1,100), 8080);
+  
+  dht.begin();
+  timer.setInterval(2500L, sendSensor);
+}
+
+void loop(){
+  Blynk.run();
+  timer.run();
+}
+void sendSensor(){
+  float h = dht.readHumidity();
+  float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
+  
+
+  Blynk.virtualWrite(V1, h);
+  Blynk.virtualWrite(V0, t);
+  Serial.print("Temperature : ");
+  Serial.print(t);
+  Serial.print("    Humidity : ");
+  Serial.println(h);
+
+
+  
+}
